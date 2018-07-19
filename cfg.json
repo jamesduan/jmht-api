@@ -1,0 +1,55 @@
+{
+    "debug": true,
+    "database": "root:redhat@tcp(127.0.0.1:3306)/jmht?loc=Local&parseTime=true",
+    "hosts": "",
+    "maxConns": 20,
+    "maxIdle": 15,
+    "listen": ":6030",
+    "trustable": [""],
+    "http": {
+        "enabled": true,
+        "listen": "0.0.0.0:8001"
+    },
+    "websocket": {
+      "enabled": true,
+      "port": ":8080"
+    },
+    "image": {
+      "filepath": "static"
+    },
+    "download": "/export/servers/download",
+    "redis": {
+        "addr": "192.168.20.164:6379",
+        "password": "123456",
+        "maxIdle": 32,
+        "migrationMapQueue": "/queue/monitorbig/migration",
+        "migrationCountQueue": "/queue/monitorbig/migration_count",
+        "relationMapQueue": "/queue/monitorbig/relation",
+        "relationMapPointQueue": "/queue/monitorbig/relation/point",
+        "enableSentinel": true
+    },
+    "redisSentinel": {
+        "sentinelAddrs": [
+            "172.20.207.60:26379",
+            "172.20.207.114:26379"
+        ],
+        "db": 63,
+        "masterName": "master1"
+    },
+    "kafka": {
+        "enabled": true,
+        "batch": 200,
+        "connTimeout": 1000,
+        "callTimeout": 5000,
+        "maxConns": 32,
+        "maxIdle": 32,
+        "replicas": 500,
+        "topics": {
+	    "plugin_exec_state": "plugin_exec_state"
+        },
+        "cluster": {
+            "kafka-00" : "192.168.20.163:9092"
+        }
+    }
+}
+
