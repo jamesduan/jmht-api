@@ -76,6 +76,15 @@ type Product struct {
 	UserID            int
 	Image             *Image
 	ProductCategoryID int
+	SetID             int
+	ProductSet        *ProductSet
+}
+
+type ProductSet struct {
+	gorm.Model
+
+	Name        string
+	EnglishName string
 }
 
 type ProductCategory struct {
@@ -118,4 +127,8 @@ func (Image) TableName() string {
 
 func (ProductCategory) TableName() string {
 	return "product_category"
+}
+
+func (ProductSet) TableName() string {
+	return "product_set"
 }

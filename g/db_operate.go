@@ -268,6 +268,12 @@ func CreateProduct(pro *Product) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	var set ProductSet
+	result = DB.First(&set, pro.SetID)
+	if result.Error != nil {
+		log.Println(result.Error)
+		return result.Error
+	}
 	result = DB.Create(pro)
 	if result.Error != nil {
 		return result.Error
@@ -288,6 +294,16 @@ func DeleteProduct(id int) error {
 	return nil
 }
 
+func GetSetByID(setID int) (*ProductSet, error) {
+	var set ProductSet
+
+	result := DB.First(&set, setID)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &set, nil
+}
+
 func QueryProducts(products *[]Product) (error, []Product) {
 	query := DB.Order("id desc").Find(products)
 	if query.Error != nil {
@@ -305,8 +321,45 @@ func QueryProducts(products *[]Product) (error, []Product) {
 			// return err, nil
 		}
 		product.Image = img
+		log.Println(product.SetID)
+		proSet, err1 := GetSetByID(product.SetID)
+		if err1 != nil {
+			log.Println(err1)
+			product.ProductSet = nil
+		}
+		product.ProductSet = proSet
+
 		tmpProducts = append(tmpProducts, product)
 	}
-	log.Println(tmpProducts)
+	// log.Println(tmpProducts)
 	return nil, tmpProducts
+}
+
+func ListProSet(sets *[]ProductSet) error {
+	result := DB.Order("id desc").Find(sets)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func ProductSetCreate(set *ProductSet) error {
+	result := DB.Create(set)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func ProductSetDel(setID int) error {
+	var set ProductSet
+	result := DB.First(&set, setID)
+	if result.Error != nil {
+		return result.Error
+	}
+	result = DB.Delete(&set)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

@@ -24,7 +24,7 @@ func InitDBConfig() {
 	DB.DB().SetMaxIdleConns(10)
 	log.Println("Initialized Db Configuration.")
 	// user
-	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{}, &Password{}, &Email{}, &Wechat{}, &Token{}, &Article{}, &Product{}, &Image{}, &ProductCategory{})
+	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{}, &Password{}, &Email{}, &Wechat{}, &Token{}, &Article{}, &Product{}, &Image{}, &ProductCategory{}, &ProductSet{})
 	user := new(User)
 	user.Name = "admin"
 	user.NickName = "管理员"

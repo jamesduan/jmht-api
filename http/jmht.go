@@ -132,11 +132,18 @@ type ProductRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	CategoryID  int    `json:"category_id"`
+	SetID       int    `json:"set_id"`
 }
 
 type CategoryRequest struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type SetRequest struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	EnglishName string `json:"en_name"`
 }
 
 func getTime(timestr string) time.Time {
@@ -189,11 +196,41 @@ func uploadImg(r *http.Request) error {
 
 func configJmhtApi() {
 
-	// http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-	// 	w.Write([]byte("ok"))
-	// })
-	// http.HandleFunc("/user/tokeninit", func(w http.ResponseWriter, r *http.Request) {
-	// })
+	http.HandleFunc("/jmht/api/product/set/list", CheckLoginStatus(func(w http.ResponseWriter, r *http.Request) {
+		var sets []g.ProductSet
+		err := g.ListProSet(&sets)
+		if err != nil {
+			RenderDataJson(w, map[string]ResponseStatus{"error": ResponseStatus{Status: 0, Message: "获取失败"}})
+		} else {
+			RenderDataJson(w, map[string][]g.ProductSet{"list": sets})
+		}
+	}))
+
+	http.HandleFunc("/jmht/api/product/set/add", CheckLoginStatus(func(w http.ResponseWriter, r *http.Request) {
+		var setR SetRequest
+		ParsePost(&setR, r)
+		set := new(g.ProductSet)
+		set.Name = setR.Name
+		set.EnglishName = setR.EnglishName
+		err := g.ProductSetCreate(set)
+		if err != nil {
+			RenderDataJson(w, map[string]ResponseStatus{"error": ResponseStatus{Status: 0, Message: "添加失败"}})
+		} else {
+			RenderDataJson(w, map[string]ResponseStatus{"set": ResponseStatus{Status: 1, Message: "添加成功"}})
+		}
+	}))
+
+	http.HandleFunc("/jmht/api/product/set/remove", CheckLoginStatus(func(w http.ResponseWriter, r *http.Request) {
+		var setR SetRequest
+		ParsePost(&setR, r)
+
+		err := g.ProductSetDel(setR.ID)
+		if err != nil {
+			RenderDataJson(w, map[string]ResponseStatus{"error": ResponseStatus{Status: 0, Message: "删除失败"}})
+		} else {
+			RenderDataJson(w, map[string]ResponseStatus{"set": ResponseStatus{Status: 1, Message: "删除成功"}})
+		}
+	}))
 
 	http.HandleFunc("/jmht/api/product/list", CheckLoginStatus(func(w http.ResponseWriter, r *http.Request) {
 		var products []g.Product
@@ -226,7 +263,8 @@ func configJmhtApi() {
 		pro.Name = pR.Name
 		pro.Description = pR.Description
 		pro.ProductCategoryID = pR.CategoryID
-
+		log.Println(pR.SetID)
+		pro.SetID = pR.SetID
 		err := g.CreateProduct(pro)
 		if err != nil {
 			log.Println(err)
